@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waleed FB Bot | Auto Messenger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #475569;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #e2e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-card);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header i {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        .file-input-wrapper {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: monospace;
+        }
+
+        /* File Inputs */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--accent);
+            background-color: var(--bg-secondary);
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .file-label i {
+            color: var(--accent);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-card);
+        }
+
+        /* Status Section */
+        .status-container {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.running {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.stopped {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent);
+            transform: translateY(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Instructions */
+        .instructions {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .instructions h3 {
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instructions li:last-child {
+            border-bottom: none;
+        }
+
+        .instructions i {
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i>
+            <span>Waleed FB Bot</span>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+            <span id="theme-text">Dark</span>
+        </button>
+    </header>
+
+    <main>
+        <div class="dashboard-grid">
+            <!-- Start Bot Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-play"></i>
+                    <h2>Start Bot</h2>
+                </div>
+                
+                <form id="startForm" onsubmit="startBot(event)">
+                    <div class="form-group">
+                        <label for="task_id">Task ID <span style="color: var(--danger)">*</span></label>
+                        <input type="text" id="task_id" placeholder="e.g., my_task_1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tokens">Access Tokens <span style="color: var(--danger)">*</span></label>
+                        <textarea id="tokens" placeholder="Paste one token per line (Multi-account support)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="thread_id">Thread ID <span style="color: var(--danger)">*</span></label>
+                        <input type="text" id="thread_id" placeholder="e.g., 123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prefix">Prefix Text</label>
+                        <input type="text" id="prefix" placeholder="Optional prefix for messages">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interval">Interval (Seconds)</label>
+                        <input type="number" id="interval" value="60" min="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Messages File (.txt)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="messages_file" accept=".txt">
+                            <div class="file-label">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span id="msg_file_name">Choose .txt file</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Images (Multiple)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="images_file" multiple accept="image/*">
+                            <div class="file-label">
+                                <i class="fa-solid fa-image"></i>
+                                <span id="img_file_name">Choose images</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn-primary" id="startBtn">
+                            <i class="fa-solid fa-play"></i> Start Bot
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stop & Status Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-stop"></i>
+                    <h2>Control & Status</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="stop_task_id">Task ID to Stop</label>
+                    <input type="text" id="stop_task_id" placeholder="Enter task ID to stop">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-danger" onclick="stopBot()">
+                        <i class="fa-solid fa-stop"></i> Stop Task
+                    </button>
+                    <button class="btn-secondary" onclick="checkStatus()">
+                        <i class="fa-solid fa-list-check"></i> Refresh Status
+                    </button>
+                </div>
+
+                <div class="status-container" id="statusContainer">
+                    <h3 style="margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.9rem;">Active Tasks</h3>
+                    <div id="statusList">
+                        <div class="status-item">
+                            <span>No active tasks</span>
+                            <span class="status-badge stopped">Stopped</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3><i class="fa-solid fa-circle-info"></i> How to Use</h3>
+            <ul>
+                <li><i class="fa-solid fa-check"></i> <strong>Task ID:</strong> Unique name for this bot session (e.g., "campaign1")</li>
+                <li><i class="fa-solid fa-check"></i> <strong>Access Tokens:</strong> One per line. Use multiple for rotation.</li>
+                <li><i class="fa-solid fa-check"></i> <strong>Thread ID:</strong> The Facebook conversation ID (numeric).</li>
+                <li><i class="fa-solid fa-check"></i> <strong>Messages File:</strong> Text file with one message per line.</li>
+                <li><i class="fa-solid fa-check"></i> <strong>Images:</strong> Select multiple images to send in rotation.</li>
+                <li><i class="fa-solid fa-check"></i> <strong>Interval:</strong> Time between messages (seconds) + random 5-15s jitter.</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                icon.className = 'fa-solid fa-sun';
+                text.textContent = 'Light';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.className = 'fa-solid fa-moon';
+                text.textContent = 'Dark';
+            }
+        }
+
+        // File Input Labels Update
+        document.getElementById('messages_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose .txt file';
+            document.getElementById('msg_file_name').textContent = fileName;
+        });
+
+        document.getElementById('images_file').addEventListener('change', function(e) {
+            const fileCount = e.target.files.length;
+            const text = fileCount > 0 ? `${fileCount} file(s) selected` : 'Choose images';
+            document.getElementById('img_file_name').textContent = text;
+        });
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Start Bot Function
+        async function startBot(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('startBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner"></div> Starting...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('task_id', document.getElementById('task_id').value);
+            formData.append('tokens', document.getElementById('tokens').value);
+            formData.append('thread_id', document.getElementById('thread_id').value);
+            formData.append('prefix', document.getElementById('prefix').value);
+            formData.append('interval', document.getElementById('interval').value);
+
+            const msgFile = document.getElementById('messages_file').files[0];
+            if (msgFile) formData.append('messages', msgFile);
+
+            const imgFiles = document.getElementById('images_file').files;
+            for (let i = 0; i < imgFiles.length; i++) {
+                formData.append('images', imgFiles[i]);
+            }
+
+            try {
+                const response = await fetch('/start', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast(`Bot started: ${data.task_id}`, 'success');
+                    // Clear form
+                    document.getElementById('startForm').reset();
+                    document.getElementById('msg_file_name').textContent = 'Choose .txt file';
+                    document.getElementById('img_file_name').textContent = 'Choose images';
+                    checkStatus(); // Refresh status
+                } else {
+                    showToast(data.message || 'Failed to start bot', 'error');
+                }
+            } catch (error) {
+                showToast('Network error. Check server connection.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Stop Bot Function
+        async function stopBot() {
+            const taskId = document.getElementById('stop_task_id').value;
+            if (!taskId) {
+                showToast('Please enter a Task ID to stop', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task_id: taskId })
+                });
+
+                const data = await response.json();
+                showToast(data.status, 'success');
+                checkStatus(); // Refresh status
+            } catch (error) {
+                showToast('Network error. Check server connection.', 'error');
+            }
+        }
+
+        // Check Status Function
+        async function checkStatus() {
+            const statusList = document.getElementById('statusList');
+            
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                if (data.tasks && Object.keys(data.tasks).length > 0) {
+                    let html = '';
+                    for (const [taskId, isRunning] of Object.entries(data.tasks)) {
+                        html += `
+                            <div class="status-item">
+                                <span>${taskId}</span>
+                                <span class="status-badge ${isRunning ? 'running' : 'stopped'}">
+                                    ${isRunning ? 'Running' : 'Stopped'}
+                                </span>
+                            </div>
+                        `;
+                    }
+                    statusList.innerHTML = html;
+                } else {
+                    statusList.innerHTML = `
+                        <div class="status-item">
+                            <span>No active tasks</span>
+                            <span class="status-badge stopped">Stopped</span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                showToast('Failed to fetch status', 'error');
+            }
+        }
+
+        // Auto-refresh status every 5 seconds
+        setInterval(checkStatus, 5000);
+
+        // Initial load
+        checkStatus();
+    </script>
+</body>
+</html>
